@@ -11,6 +11,8 @@ import {
   IntentsBitField,
 } from "discord.js";
 
+import { jobScanner } from "./features/job-scanner.js";
+
 import { logger, channelLog } from "./features/log.js";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation.js";
@@ -125,9 +127,10 @@ const addHandler = (
   channels.forEach((channelId) => {
     const existingHandlers = channelHandlersById[channelId];
     if (existingHandlers) {
-      existingHandlers.push(...handlers);
+      // Create a new array to avoid mutating the existing one
+      channelHandlersById[channelId] = [...existingHandlers, ...handlers];
     } else {
-      channelHandlersById[channelId] = handlers;
+      channelHandlersById[channelId] = [...handlers];
     }
   });
 };
@@ -203,6 +206,19 @@ addHandler(
     CHANNELS.twitterFeed,
   ],
   promotionThread,
+);
+
+addHandler(
+  [
+    CHANNELS.helpReact,
+    CHANNELS.helpJs,
+    CHANNELS.helpReactNative,
+    CHANNELS.helpStyling,
+    CHANNELS.helpBackend,
+    CHANNELS.generalReact,
+    CHANNELS.generalTech,
+  ],
+  jobScanner,
 );
 
 const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
